@@ -1,0 +1,916 @@
+\documentclass[12pt]{article}
+
+\usepackage{amsmath, amssymb}
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage{csquotes}
+ 
+\usepackage[a4paper, total={6in, 10in}]{geometry}
+\usepackage{bibstuff} 
+\addbibresource{peters.bib}
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{acknowledgement}[theorem]{Acknowledgement}
+\newtheorem{algorithm}[theorem]{Algorithm}
+\newtheorem{axiom}[theorem]{Axiom}
+\newtheorem{case}[theorem]{Case}
+\newtheorem{claim}[theorem]{Claim}
+\newtheorem{conclusion}[theorem]{Conclusion}
+\newtheorem{condition}[theorem]{Condition}
+\newtheorem{conjecture}[theorem]{Conjecture}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{criterion}[theorem]{Criterion}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+\newtheorem{exercise}[theorem]{Exercise}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{notation}[theorem]{Notation}
+\newtheorem{problem}[theorem]{Problem}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{remark}[theorem]{Remark}
+\newtheorem{solution}[theorem]{Solution}
+\newtheorem{summary}[theorem]{Summary}
+\newenvironment{proof}[1][Proof]{\textbf{#1.} }{\ \rule{0.5em}{0.5em}}
+%\input{tcilatex}
+
+\begin{document}
+
+\title{Factorisation and Continued Fractions}
+\author{Peter Walker}
+\maketitle
+
+\begin{abstract}
+In an early paper \cite{vonSchafgotsch:1786:FVS} on factorisation of
+integers, the author proposes an elementary method which we develop here by
+means of continued fractions.. Its success rate (the proportion of integers
+non-trivially factorised) is surprisingly high, at around \ 80\%, and we are
+able to give an explicit description of the cases in which the method fails.
+
+We then give a number of improvements and extensions of the method which
+increase both its success rate and its speed of execution. In particular we
+introduce the elementary quadratic domains $\mathbf{Z}(i),\mathbf{Z}(\sqrt{-2%
+})$ and $\mathbf{Z}(2)$ as areas in which factorisation of rational integers
+may be carried out successfully.
+
+Subject Classification: 11A51, 11A55, 11R11
+\end{abstract}
+
+\section{Introduction and a simple algorithm\label{int}}
+
+Fermat's method of factorisation of a given integer by expressing it as the
+difference of two squares (or more generally as a divisor of the difference
+of two squares) is one of the oldest in number theory. An early example of
+its use was given by F. von Schafgotsch, \cite{vonSchafgotsch:1786:FVS} in
+which for given odd integer $n$ we consider integers $a,b,x,$ which satisfy $%
+an=b\left( x^{2}-1\right) $ and $n,a,b$ are relatively prime. Then the
+greatest common divisors $n_{1}=\gcd \left( n,x+1\right) ,$ and $n_{2}=\gcd
+\left( n,x-1\right) $ give a factorisation $n=n_{1}n_{2}.$ Unfortunately no
+practicable method for finding suitable $a,b,x$ is given in \cite%
+{vonSchafgotsch:1786:FVS}, but it is not difficult to give such a method by
+using the theory of continued fractions.
+
+We use the standard notation for the continued fraction expansion of the
+square root of a given integer, as detailed for instance in \cite%
+{Davenport:1970:THA}.
+
+\textbf{Example 1}\label{e1} Let $n=91,$ with continued fraction expansion 
+\begin{equation*}
+\sqrt{91}=\left[ 9,1,1,5,1,5,1,1,18,....\right] .
+\end{equation*}%
+The sequence of convergents is%
+\begin{equation*}
+\left( 9/1,10/1,19/2,105/11,124/13,725/76,849/89,1574/165,...\right) 
+\end{equation*}%
+Write $x$ for the numerator of the last entry here, corresponding to the
+term before the occurrence of $18=2\left[ \sqrt{91}\right] .$ Here $x=1574.$
+Then the greatest common divisors $\gcd (n,x-1)=\gcd \left( 91,1573\right)
+=13$ and $\gcd (n,x+1)=\gcd \left( 91,1575\right) =7$ give $91=13.7$ as the
+product of relatively prime odd integers. $\blacklozenge $ \ (In addition
+to the usual $\blacksquare $ to indicate the end of a proof, we shall use $%
+\blacklozenge $ to indicate the end of the discussion following an example.)
+
+To investigate the extent to which this method works more generally, we
+shall need the following result from the classical theory of continued
+fractions \cite[Chapter IV]{Davenport:1970:THA}.
+
+\begin{theorem}
+\label{t1}Let $n$ be a positive non-square odd integer. Write $n$ as a
+continued fraction $\sqrt{n}=\left[ a_{0},a_{1},...,a_{k},...\right] $ where 
+$a_{1},...,a_{k}$ is the periodic part, $a_{0}=\left\lfloor \sqrt{n}%
+\right\rfloor $ and $a_{k}=2a_{0}.$ $k$ is called the length of the
+continued fraction (strictly, the length of the periodic part). Let $x/y$
+denote the last but one convergent here, corresponding to the term $a_{k-1}.$
+Then 
+\begin{equation}
+\left( x+y\sqrt{n}\right) \left( x-y\sqrt{n}\right) =x^{2}-ny^{2}=\left(
+-1\right) ^{k}.  \label{inta}
+\end{equation}
+\end{theorem}
+
+When $k$ is even, the equation is 
+\begin{equation}
+x^{2}-ny^{2}=1  \label{intb}
+\end{equation}%
+and it is known that $(x,y)$ determines the smallest solution of this
+equation and that all other solutions are given by $\left( x_{i}+y_{i}\sqrt{n%
+}\right) =\left( x+\sqrt{n}\right) ^{i},i\in \mathbf{Z.}$Hence we have the
+following corollary:
+
+\begin{corollary}
+\label{t2}Let $n$ be a positive non-square odd integer for which the
+continued fraction for $\sqrt{n}$ has even length. Let $x,y$ be as in the
+preceding theorem, and let $n_{1},n_{2}$ equal $\gcd \left( n,x-1\right) $
+and $\gcd \left( n,x+1\right) $ respectively. Then $n=n_{1}n_{2}$ gives a
+factorisation of $n$ which is non-trivial unless $n$ divides either $x-1$ or 
+$x+1.$
+\end{corollary}
+
+\begin{proof}
+Write (\ref{intb}) as $ny^{2}=\left( x-1\right) \left( x+1\right) $ in which 
+$x\pm 1$ can have no common divisors other than possibly $2$. Hence each odd
+prime divisor of $n$ must divide exactly one of $x\pm 1$ and the result
+follows.
+\end{proof}
+
+We deduce that the method succeeds except in one or other of two cases.
+Firstly if $k$ is odd, or equivalently if $a_{1},...,a_{k-1}$ has no central
+term, then we arrive at $y^{2}n=x^{2}+1$ and we can not factorise in the way
+required (these cases are dealt with in section \ref{gi} on Gaussian
+integers). We shall call this a Type I failure. Secondly, when $k$ is even,
+the resultant factorisation may be trivial in that one or other of $%
+n_{1},\,n_{2}$ may equal $1.$ This happens if and only if one of $x\pm 1$ is
+a multiple of $n;$ in particular this would happen if $n$ is prime. We shall
+call this a Type II failure; integers of this type are dealt with in
+sections \ref{zmt} and \ref{zpt}.
+
+We illustrate these possibilities with some further examples.
+
+\textbf{Example 2 }Let $n=85,$ $\sqrt{85}=\left[ 9;4,1,1,4,18,...\right] .$
+Here $k=5$ is odd, and we have a Type I failure. $\blacklozenge $
+
+\textbf{Example 3 }Let $n=187,$ $\sqrt{n}=\left[ 13;1,2,13,2,1,26,...\right]
+.$ Here $k=6,$ and $x=1682.$ Then gcd$\left( n,x-1\right) =\gcd \left(
+187,1681\right) =1$ and gcd$\left( n,x+1\right) =$gcd$\left( 187,1683\right)
+=$ $187,$ giving $187=1\cdot 187,$ a Type II failure. $\blacklozenge $
+
+\textbf{Example 4} For a slightly larger $n$, let $n=4725,$
+
+$\,\sqrt{4725}=\left[ 68,1,2,1,4,1,2,1,136,...\right] ,$ \ $x=6049.\ $
+
+Then gcd$\left( n,x-1\right) =\gcd \left( 4725,6048\right) =189$, gcd$\left(
+n,x+1\right) =$gcd$\left( 4725,6050\right) =25,$ and hence $n=189.25.$ Then
+the method can be repeated with $n=$ $189$ to give $189=3^{3}\cdot 7$ and we
+end with $4725=3^{3}5^{2}7.$ $\blacklozenge $
+
+Note that, as in this example, an odd prime power divisor of $n$ can divide
+only one of $x-1$, $x+1$ so that, if successful, we are factoring into prime
+powers rather than individual primes, see for instance \cite[1.7.3]%
+{Cohen:1993:EF}.
+
+We illustrate the method with some numerical results, found by David Walker
+using \texttt{sagemath}, which illustrate the proportions of the various
+outcomes and which are intended for comparison with other improvements to
+come. The values of $n$ tested are those which are composite, not square and
+not divisible by $2,3,5.$ (Thus the starting value is 77 which is the least
+integer satisfying these conditions.) The times are of course highly
+dedpendent on the machine and the program, and again are included only for
+comparison with later methods.
+
+\begin{center}
+\begin{equation*}
+\begin{tabular}{|l|l|l|l|l|}
+\hline
+Range of $n$ & Success & Type I fail & Type II fail & Time(s) \\ \hline
+$77\leq n\leq 1,000$ & $73\left( 79.4\%\right) $ & $6\left( 6.5\%\right) $ & 
+$13(14.1)$ & $0.04$ \\ \hline
+$77\leq n\leq 2,000$ & $176(79.6\%)$ & $18\left( 8.1\%\right) $ & $27\left(
+12.2\%\right) $ & $0.09$ \\ \hline
+$77\leq n\leq 5,000$ & $502\left( 77.6\%\right) $ & $58\left( 9.0\%\right) $
+& $87\left( 13.4\%\right) $ & $0.29$ \\ \hline
+$77\leq n\leq 10,000$ & $1077\left( 76.4\%\right) $ & $134\left(
+9.5\%\right) $ & $199\left( 14.1\%\right) $ & $0.66$ \\ \hline
+$77\leq n\leq 20,000$ & $2301\left( 75.9\%\right) $ & $307\left(
+10.1\%\right) $ & $423\left( 14.0\%\right) $ & $1.62$ \\ \hline
+\end{tabular}%
+\end{equation*}
+\end{center}
+
+When $k$ is odd we noted already that we have 
+\begin{equation*}
+y^{2}n=x^{2}+1
+\end{equation*}%
+and so $n$ is a divisor of a primitive (relatively prime) sum of squares. It
+follows from the general theory of integers which are sums of squares %
+\cite[Chapter V]{Davenport:1970:THA} that $n$ and all its \ prime divisors
+are congruent to 1 mod $4$ and so are also sums of squares. This proves
+
+\begin{proposition}
+\label{p1}If the method fails because $k$ is odd (a Type I failure) then
+every prime divisor of $n$ is congruent to $1$ mod $4.$ Equivalently if any
+prime divisor of $n$ is congruent to $-1$ mod $4$ (and in particular if $n$
+itself is congruent to $-1$ mod $4),$ then $k$ is even and the method will
+give a factorisation (possibly trivial)\ of $n.$
+\end{proposition}
+
+This necessary conclusion is not sufficient: the first example to the
+contrary is when $n=221=13.17$ \ and $k=6.$
+
+\begin{proposition}
+\label{p2}If $k$ is even and the factorisation is trivial (a Type II
+failure), then $n\equiv -1$ mod $4.$ Equivalently if $k$ is even and $%
+n\equiv 1$ mod $4$ then the method will succeed.
+\end{proposition}
+
+\begin{proof}
+When $k$ is even we noted in $\left( \ref{intb}\right) $ that $%
+y^{2}n=x^{2}-1.$ Hence if $y$ is odd then $x$ is even and so $x^{2}-1$ $%
+\equiv -1$ mod $4.$ But as an odd square, $y^{2}\equiv 1$ mod $4$ and it
+follows that $n\equiv y^{2}n=x^{2}-1$ $\equiv -1$ mod4.
+
+The case in which $y$ is even while $x$ is odd presents more difficulty. We
+begin with the observation that since $x-1,x+1$ are consecutive even numbers
+then one has the form $2f$ for some odd integer $f,$ while the other has the
+form $2^{j}g$ for some $j\geq 2$ and $g$ odd. Also we are assuming that $y$
+is even, so $y=2^{i}s$ for $i\geq 1$ and $\ s$ is odd. Equating powers of $2$
+in $\left( \ref{intb}\right) $ gives $2i=1+j$ so $j$ must be odd, $j\geq 3$
+and $i\geq 2.$ Hence we have either
+
+\begin{eqnarray*}
+x-1 &=&2f\text{ and }\,x+1=2^{j}g=2^{2i-1}g,\text{ or} \\
+x-1 &=&2^{2i-1}g\text{ and }x+1=2f.
+\end{eqnarray*}
+
+Hence either 
+\begin{equation}
+2^{2i-1}g-2f=2,\text{and so }f=4^{i-1}g-1  \tag{A}
+\end{equation}
+
+or 
+\begin{equation}
+2f-2^{2i-1}g=2,\text{ and so }f=4^{i-1}g+1.  \tag{B}
+\end{equation}
+
+Also if we substitute for $x-1,x+1,y$ in $\left( \ref{intb}\right) $ and
+remove powers of $2$ we get 
+\begin{equation*}
+(2^{i}s)^{2}n=\left( 2f\right) \left( 2^{2i-1}g\right) ,\text{ and so }%
+s^{2}n=fg
+\end{equation*}%
+where all $s,n,f,g$ are odd and $f,g$ are relatively prime. \ Since we know
+that $n$ divides exactly one of $x-1$ \ or $x+1$ if follows that $n$ must
+divide exactly one of $f,g$. \ Write $s_{1}=\gcd \left( s,f\right) $ and $%
+s_{2}=\gcd \left( s,g\right) $ so when $n$ divides $f$ we have $s_{1}^{2}n=f$
+and $s_{2}^{2}=g,$ or when $n$ divides $g$ we have $s_{1}^{2}=f$ and $%
+s_{2}^{2}n=g.$ Hence exactly one of $f$,$g$ is a square.
+
+This gives us four possibilities to be considered:
+
+A1 when A above is satisfied and $g$ is square, A2 when A is satisfied and $%
+f $ is square, B1 when B is satisfied and $g$ is square, and B2 when B is
+satisfied and $f$ is square.
+
+In case A1, condition A together with $g$ being square shows that $f$ is one
+less than an even square and hence that $n\equiv f\equiv -1$ mod 4 as
+required.
+
+In case A2, condition A gives $f\equiv -1$ mod 4 while $f$ being square
+gives $f\equiv 1$ mod 4, a contradiction.
+
+In case B1, we have $f=4^{i-1}g+1$, $s_{1}^{2}n=f$ and $s_{2}^{2}=g.$ Hence%
+\begin{eqnarray*}
+s_{1}^{2}n=f=4^{i-1}g+1 &=&4^{i-1}s_{2}^{2}+1, \\
+\left( 2^{i-1}s_{2}\right) ^{2}-s_{1}^{2}n &=&-1.
+\end{eqnarray*}%
+which is of the form $ny^{2}=x^{2}+1$. But as noted, following this equation
+in the introduction, there are no such solutions when $k$ is even so case B1
+is impossible.
+
+Finally in case B2, we have $f=4^{i-1}g+1,\,s_{1}^{2}=f$ and $s_{2}^{2}n=g.$
+Hence 
+\begin{eqnarray*}
+s_{1}^{2}=f=4^{i-1}g+1 &=&4^{i-1}s_{2}^{2}n+1 \\
+s_{1}^{2}-\left( 2^{i-1}s_{2}\right) ^{2}n &=&1
+\end{eqnarray*}%
+and we have a solution $\left( s_{1},2^{i-1}s_{2}\right) $of equation $%
+\left( \ref{intb}\right) .$ Here $s_{1}^{2}=f<fg=s^{2}n<y^{2}n$ since $%
+y=2^{i}s$ for $i\geq 1.$ \ But form$,$ $y^{2}n=x^{2}-1$ we conclude that $%
+s_{1}<x$ which contradicts the minimality of $\left( x,y\right) $ as a
+solution of $\left( \ref{intb}\right) $ giving the required contradiction.
+\end{proof}
+
+Again the necessary conclusion is not sufficient since for instance $%
+n=15,35,39$ have $n\equiv -1$ mod 4 and $k=2$ and all factorise successfully.
+
+Combining the results of Propositions \ref{p1} and \ref{p2} gives
+
+\begin{theorem}
+\label{t3}If $n\equiv 1$ mod $4$ but has a divisor which is $\equiv -1$ mod $%
+4$ then the method will give a non-trivial factorisation of $n.$ \ In
+particular the method will succeed when $n$ is a product of distinct primes,
+an odd number of which are $\equiv -1$ mod $4$.
+\end{theorem}
+
+\begin{proof}
+From Proposition \ref{p1} $k$ must be even and so from Proposition \ref{p2}
+the method will give a non-trivial factorisation of $n$
+\end{proof}
+
+The situation regarding the parity of $k$ is clearer when $n$ is prime.
+
+\begin{corollary}
+\label{t4}When $n$ is prime then
+\end{corollary}
+
+(i) $k$ is odd if and only if $n\equiv $ 1 mod 4, and
+
+(ii) $k$ is even if and only if $n\equiv $ $-1$ mod 4.
+
+\begin{proof}
+To begin with, if $n$ is prime and $k$ is odd then from Proposition \ref{p1}%
+, we find $n\equiv $ 1 mod 4 which is the direct half of (i). It also shows
+that if $n\equiv $ $-1$ mod 4 then $k$ is even, which is the converse of
+(ii).
+
+n addition if $n$ is prime then the condition that $n|\left( x^{2}-1\right) $
+should imply $n|\left( x-1\right) $ or $n|\left( x+1\right) $ is satisfied
+automatically so the factorisation must be trivial and $n\equiv $ $-1$ mod 4
+follows from Proposition \ref{p2} when $k$ is even. This is the direct half
+of (ii) and also the converse of (i).
+\end{proof}
+
+\section{Looking for Squares\label{ls}}
+
+To develop the method further, we shall need the customary notation 
+\begin{equation*}
+\left( A_{j}\right) ,\left( B_{j}\right) ,\left( C_{j}\right) ,\left(
+P_{j}\right) ,\left( Q_{j}\right) 1\leq j\leq k,
+\end{equation*}%
+for the development of the continued fraction for the square root of a
+positive non-square integer $n$ as found in for instance \cite[Ch. 10]%
+{Bressoud:1989:IEF}. Here $\left( A_{j}\right) $ is the same as the sequence 
+$\left( a_{j}\right) $ in Theorem \ref{t1} and $\left( P_{j}/Q_{j}\right) $
+gives the sequence of convergents where $P_{k-1}/Q_{k-1}$ is denoted there
+by $x/y$.
+
+These sequences have the initial values 
+\begin{eqnarray*}
+A_{1} &=&n_{0}=\left\lfloor \sqrt{n}\right\rfloor , \\
+B_{0} &=&0,\,B_{1}=n_{0}, \\
+C_{0} &=&1,\,C_{1}=n-\left( n_{0}\right) ^{2}, \\
+P_{0} &=&1,\,P_{1}=n_{0},
+\end{eqnarray*}%
+and for $j\geq 2$ satisfy the recurrences%
+\begin{align}
+\text{(i) }A_{j+1}& =\left\lfloor \frac{n_{0}+B_{j}}{C_{j}}\right\rfloor 
+\text{ },  \label{ls1} \\
+\text{(ii) }P_{j+1}& =P_{j-1}+A_{j+1}P_{j},  \notag \\
+\text{(iii) }B_{j+1}& =A_{j+1}C_{j}-B_{j},  \notag \\
+\text{(iv) }C_{j+1}& =C_{j-1}+A_{j+1}\left( B_{j}-B_{j+1}\right) .  \notag
+\end{align}
+
+An equivalent form for (iv) is $B_{j+1}^{2}+C_{j}C_{j+1}=n,$ from which (iv)
+is deduced by putting $j$ for $j+1$ and subtracting.
+
+The principal property of these sequences which we shall need, is that at
+every step we have%
+\begin{equation}
+P_{j}^{2}-nQ_{j}^{2}=\left( -1\right) ^{j}C_{j},\,2\leq j\leq k  \label{ls2}
+\end{equation}%
+and in particular 
+\begin{equation}
+P_{j}^{2}\equiv \left( -1\right) ^{j}C_{j}\,\text{mod }n,\,2\leq j\leq k.
+\label{ls3}
+\end{equation}
+
+Since from now on we shall be dealing exclusively with the congruence (\ref%
+{ls3}) we see that it is sufficient in (\ref{ls1}) to calculate successive
+values of $P_{j}$ mod $n$ giving an upper bound on the values of $P$. Then
+in (\ref{ls3}) we can examine each even value of $j$ to find whether $C_{j}$
+is an integer square. It might be thought that this extra checking would
+slow down the process but in practice suitable squares are found relatively
+quickly. Then if say $C_{j}=t^{2}$ for an even value of $j$ we can write (%
+\ref{ls3}) as $P_{j}^{2}\equiv t\,^{2}$ mod $n,$ and proceed to find the
+greatest common divisors of $n$ \ with $P_{j}\pm t.$ Of course failures of
+Types I and II may still occur, but their number is very much reduced. We
+give the following examples.
+
+\textbf{Example 5}\label{e5} (i) Let $n=91,$ as in example \ref{e1} Then $%
+P_{2}=10$ and $C_{2}=9=3^{2}$ giving $91=\left( 10-3\right) (10+3)=7.13$ as
+required.
+
+(ii) Let $n=1783647329$. Then after $2$ steps we find $C_{2}=1225$ $=35^{2}$%
+and $P_{2}=168933.$ Hence%
+\begin{eqnarray*}
+168933^{2} &\equiv &35^{2}\text{ mod }n, \\
+\left( 168933-35\right) \left( 168933+35\right) &\equiv &0\text{ mod }n \\
+168898.168968 &\equiv &0\text{ mod }n
+\end{eqnarray*}%
+and the greatest common divisors of $n$ with the factors on the left are $%
+84449$ and $21121$, giving the required factorisation\ of $n$ (into primes
+as it happens). $\blacklozenge $
+
+The example in (ii) above is given in \cite[p. 60]{Bressoud:1989:IEF} as one
+which is particularly resistant to Fermat's method of factorisation by
+writing $n$ as a difference of two squares.
+
+The next table gives the results for this method which show, by comparison
+with the table in the previous section, by how much failure rates have
+fallen.
+
+\begin{equation*}
+\begin{tabular}{|l|l|l|l|l|}
+\hline
+Range of $\ n$ & Success & Type I fail & Type II fail & Time$(s)$ \\ \hline
+$77\leq n\leq 1,000$ & $82\left( 89.1\%\right) $ & $2\left( 2.2\%\right) $ & 
+$8\left( 8.7\%\right) $ & $0.03$ \\ \hline
+$77\leq n\leq 2,000$ & $201\left( 91.0\%\right) $ & $4\left( 1.8\%\right) $
+& $16\left( 7.2\%\right) $ & $0.08$ \\ \hline
+$77\leq n\leq 5,000$ & $589\left( 91.0\%\right) $ & $13\left( 2.0\%\right) $
+& $45\left( 7.0\%\right) $ & $0.23$ \\ \hline
+$77\leq n\leq 10,000$ & $1297\left( 92.0\%\right) $ & $26\left( 1.8\%\right) 
+$ & $87\left( 6.2\%\right) $ & $0.50$ \\ \hline
+$77\leq n\leq 20,000$ & $2794\left( 92.2\%\right) $ & $68\left( 2.2\%\right) 
+$ & $169\left( 5.6\%\right) $ & $1.11$ \\ \hline
+\end{tabular}%
+\end{equation*}
+
+\bigskip
+
+\textbf{Larger Values} In addition to the values of $n$ in this table we
+have also considered batches of integers in the ranges $10^{m}<n<10^{m}+100$
+for $10<m<20$. After removing multiples of 2,3,5 this gives around 20 values
+to be tested in each batch, resulting in at most 1 failure in any batch,
+which compares favourably with probabilistic algorithms over the same ranges.
+
+Factorisation methods for Type I and II failures are in sections 4,5,and 6.
+
+\section{Symmetry\label{sy}}
+
+The sequence of partial quotients $\sqrt{n}=\left[ a_{0},a_{1},...,a_{k},...%
+\right] $ (equivalently the sequence $\left( A_{j}\right) $ in the notation
+above) with length $k$ is known to be symmetric in \ the sense that $%
+a_{j}=a_{k-j}$ for $1\leq j\leq k-j.$ Thus when $k$ is even and $m=k/2$ we
+have we have a central value $a_{m}$ with $a_{m-j}=a_{m+j}$ for $0\leq j<m.$
+Similarly when $k$ is odd and $m=\left( k-1\right) /2$ there are two equal
+central values $a_{m}=a_{m+1},$ with $a_{m-j}=a_{m+1+j}$ for $0\leq j<m.$
+
+It is less well known that the sequences $\left( B_{j}\right) $ and $\left(
+C_{j}\right) $ have similar symmetry properties which will give us useful
+information about what happens at the the halfway point of the partial
+fraction.
+
+\begin{theorem}
+$\label{sy1}$ Let $\left( B_{j}\right) $ and $\left( C_{j}\right) $ be
+defined as in (\ref{ls1}), for the expansion with length $k$ for a given
+input $n.$ Then for $1\leq j\leq k,$ 
+\begin{eqnarray}
+B_{j} &=&B_{k+1-j}\text{ and}  \label{sy2} \\
+C_{j} &=&C_{k-j}.  \label{sy3}
+\end{eqnarray}
+
+In particular if $k$ is odd and $m=\left( k-1\right) /2$ then $C_{m}=C_{m+1}$
+while if $k$ is even and $m=k/2$ then $B_{m}=B_{m+1}.$
+\end{theorem}
+
+This is proved in \cite[Section 3.4]{Jacobson:2009:JW} and will have a
+number of important consequences, the first of which is as follows.
+
+\begin{corollary}
+\label{sy4}Suppose $k$ is odd and $m=\left( k-1\right) /2.$ Then $%
+n=B_{m+1}^{2}+C_{m+1}^{2}.$
+\end{corollary}
+
+\begin{proof}
+Immediate on substituting $C_{m}=C_{m+1}$\ into $B_{m+1}^{2}+C_{m}C_{m+1}=n$ 
+$\ $(see the note following(\ref{ls1})).
+\end{proof}
+
+The following elegant result is crucial for what follows.
+
+\begin{lemma}
+\label{sy5}\textrm{(}M\"{a}rker\cite{Marker:1840:UP}\textrm{)} Let $k$ be
+even and $m=k/2.$ If $C_{m}$ is even then either $C_{m}=2$ or C$_{m}/2$ is a
+proper divisor of $n.$ If $C_{m}$ is odd then $C_{m}$ is a proper divisor of 
+$n$
+\end{lemma}
+
+\begin{proof}
+Notice that $C_{m}$ cannot equal 1 since this would indicate the end of the
+expansion rather than the midpoint.
+
+Since $k$ is even, we know from Theorem \ref{sy1} that $B_{m}=B_{m+1}$ and
+hence from \ref{ls1}(iii) that $2B_{m}=A_{m+1}C_{m}.$ Since also $%
+n=B_{j+1}^{2}+C_{j}C_{j+1}$ for all $j$ ,we deduce that with $j=m-1$ we have 
+\begin{eqnarray}
+n &=&B_{m}^{2}+C_{m-1}C_{m}  \notag \\
+&=&\left( A_{m+1}C_{m}\right) ^{2}/4+C_{m-1}C_{m}  \label{sy6} \\
+&=&\left( C_{m}/2\right) \left( A_{m+1}^{2}C_{m}/2+2C_{m-1}\right)  \notag \\
+&=&\left( C_{m}/2\right) X\text{ }  \notag
+\end{eqnarray}%
+for some integer $X.$ It follows that if $C_{m}$ is even then $C_{m}/2$ is a
+divisor of $n.$ Since clearly $X>2,$ it follows that $C_{m}/2$ is a proper
+divisor in all cases except $C_{m}=2.$
+
+If $C_{m}$ is odd then it follows from $2B_{m}=A_{m+1}C_{m}$ that $A_{m+1}$
+is even and we can write $\left( \ref{sy6}\right) $ as $n=C_{m}\left( \left(
+A_{m+1}/2\right) ^{2}C_{m}+C_{m-1}\right) =C_{m}Y$ for some integer $Y,$ and
+since $Y>2,$ it follows that $C_{m}$ is a proper divisor of $n$ as required.
+\end{proof}
+
+This result enables us to sharpen our algorithm in the following way.
+
+\textbf{Algorithm} For a positive integer $n$ which is not square, not prime
+and not divisible 2,3 or 5, construct the sequences $\left( A_{j}\right)
+,\left( B_{j}\right) ,\left( C_{j}\right) ,\left( P_{j}\text{ mod }n\right) $
+as before.
+
+For each value of $j\geq 2$ test $C_{j}$ as follows:
+
+\qquad (i) is $C_{j}=C_{j-1}?$ \ If so then $n$ can be written as a sum of
+squares, say $n=a^{2}+b^{2}$ as in Corollary \ref{sy4}, and we consider $n$
+together with the corresponding $a,b$ in the next section \ref{gi}. Note
+that all Type I failures from section \ref{ls} are dealt with here, leaving
+Type II\ failures to be dealt with in (iii) below.
+
+\qquad (ii) is $d:=\gcd \left( n,C_{j}\right) >1?$ If so the required
+divisor $d$ is found and the algorithm terminates.
+
+\qquad (iii) is $C_{j}=2?$ If so then we have a solution to the congruence $%
+P_{j}^{2}\equiv 2(-1)^{j}$ mod $n,$ and we deal with $n$ together with the
+corresponding values of $j,P_{j}$ in sections \ref{zmt} or \ref{zpt}
+according to whether $j$ is odd or even respectively.
+
+\qquad (iv) is $C_{j}=x^{2}$ for some (positive) integer $x$? If so then we
+have a solution to the congruence $P_{j}^{2}\equiv (-1)^{j}x^{2}$ mod $n.$
+If $j$ is odd we have $P_{j}^{2}+x^{2}\equiv 0$ mod $n$ and we deal with $n$
+together with the corresponding $P_{j}$ and $x$ in section \ref{gi} as in
+(i) above. Otherwise when $j$ is even we take the highest common factors of $%
+n$ with $P\pm x$ as in section \ref{ls} to find a factorisation of $n.$ If
+this is non-trivial then the algorithm terminates, otherwise we continue
+with the next value of $j.$
+
+\qquad
+
+\textbf{Notes} 1. The condition $\gcd \left( n,C_{j}\right) >1$ is required
+only to deal with the exceptional case which may occur in M\"{a}rker's Lemma
+when $j=k/2.$ However it may it may occur earlier by chance and is quick to
+test.
+
+2. Only last part of (iv) requires us to move to the next value of $j$: all
+other steps either send us to a different section, or terminate the
+algorithm at once.
+
+3. We have shown that when $k$ is odd then $C_{j}=C_{j+1}$ must occur at the
+mid point $j=\left( k-1\right) /2$ , and that when $k$ is even that $C_{j}=2$
+must occur when $j=k/2$ . Hence the iteration over $j$ must finish at the
+midpoint if not sooner. This, together with the reduction of $P_{j}$ mod $n$
+at each step, results in a substantial decrease in the number of values of $%
+j $ to be considered, and the size of the values of P$_{j}$.
+
+4. The above algorithm is stated for a single value of $n.$ If a range of
+values is to be tested, then it seems more efficient to store the results of
+(i), (iii) and (iv) in separate Lists which can then be referred to later
+sections separately.
+
+For instance when we consider the range 77$\leq n\leq 20,000$ we generate
+three lists of which the first, (List 1), consists of 68 numbers between 533
+and 19637 in which $n$ is either a sum of squares, together with the
+associated $a,b$ with $n=a^{2}+b^{2}$ or a divisor of such a sum. These will
+be dealt with in section \ref{gi}\ . Then there will be a second, (List 2a)
+of 68 numbers between 731 and 19883 to be dealt with in section \ref{zmt}
+when $C_{j}=2$,\thinspace\ $j$ is odd and $P_{j}^{2}\equiv -2$ mod n, and a
+third, (List 2b) of 101 numbers between 119 and 19967 to be dealt with in
+section \ref{zpt} when $C_{j}=2$,\thinspace\ $j$ is even, and $%
+P_{j}^{2}\equiv 2$ mod n.
+
+\section{Gaussian integers\label{gi}}
+
+\textbf{Notation} Throughout this section the notation $\left( a,b\right) $
+will denote the Gaussian integer $a+ib.$ All arithmetic operations together
+with the Euclidean algorithm, and the formation of continued fractions - the
+latter justified in the papers of Hurwitz, \cite{Hurwitz:1888:UEC},\cite%
+{Hurwitz:1889:UAK} - will take place in $\mathbf{Z}\left( i\right) .$ We
+shall use $\left( a,b\right) \cap (c,d)$ for the highest common factor of $%
+\left( a,b\right) $ and $\left( c,d\right) $, uniquely defined since $%
+\mathbf{Z}\left( i\right) $ is a Euclidean Domain.. When $x.y$ are real, ni$%
+\left( x,y\right) $ will denote the nearest integer function in $\mathbf{Z}%
+\left( i\right) $, equal to $\left( \left\{ x\right\} ,\left\{ y\right\}
+\right) $ where $\left\{ x\right\} $ and $\left\{ y\right\} $ are the unique
+integers in the intervals $[x-1/2,x+1/2).$and $[y-1/2,y+1/2)$
+
+We shall consider the values of $n$ which arise in List1, that is from
+stages (i) or (iv) in the algorithm in the previous section. Such numbers
+are either equal to sums of squares or to divisors of such sums. For
+instance if we consider $n=493$ by the method of section \ref{ls} we find
+that $n$ is a divisor of $111^{2}+4=\left( 111,2\right) \left( 111,-2\right)
+.$ To reduce this multiple of $493$ to a sum of squares we simply take $%
+\left( 111,2\right) \cap \left( 493,0\right) =\left( 22,3\right) $ to obtain 
+$493=22^{2}+$ $3^{2.}.$ When $n$ comes from part (i) we have seen from
+Corollary \ref{sy4} that when $k$ is odd and $m=\left( k-1\right) /2$ then $%
+n $ is given directly by $n=B_{m+1}^{2}+C_{m+1}^{2}.$
+
+Hence in considering the entries in List 1, we may suppose that each value
+of $n$ is known as a sum of squares, say $n=a^{2}+b^{2}=\left( a+ib\right)
+\left( a-ib\right) $ for integers $a,b$ which we may assume positive without
+loss of generality. To find a divisor of $n,$ we find divisors of $a+ib$ in $%
+\mathbf{Z}\left( i\right) $ by calculating the continued fraction for $\sqrt{%
+a+ib}$ and looking for square values of $C_{j}$ (\textit{not} the same as
+the values of $C,$ etc. from the continued fraction for $\sqrt{n}).$ We may
+use a numerical routine for the value of this square root, or find an exact
+expression from the following:
+
+\begin{lemma}
+Let $\left( x+y\sqrt{r}\right) ^{2}=a+b\sqrt{r}$ with $a,b$ positive$.$ Then
+for $r<0$ we may take 
+\begin{equation*}
+x=\sqrt{\frac{a+\sqrt{a^{2}-rb^{2}}}{2}\text{ }}\text{and }y=\frac{b}{2x}
+\end{equation*}%
+with both square roots positive.
+
+If $r>0$ then we require also $a^{2}>rb^{2}$ and we may take
+
+\begin{equation*}
+x=\sqrt{\frac{a+\sqrt{a^{2}-rb^{2}}}{2}\text{ }}\text{and }y=\frac{b}{2x}%
+\text{ similarly.}
+\end{equation*}
+\end{lemma}
+
+\begin{proof}
+Immediate on expanding $\left( x+y\sqrt{r}\right) ^{2}$ and equating
+coefficients of $1,\sqrt{r}.$
+\end{proof}
+
+We shall need only the cases $r=-1,-2$ and $2$ in this result. With these
+preliminaries, we now calculate the continued fraction for $\sqrt{\left(
+a,b\right) }$ as in section \ref{ls} with the following modifications.
+
+(i) Given $n=a^{2}+b^{2}$ and $\left( a,b\right) =a+ib$ to be factorised,
+let $z=\sqrt{\left( a,b\right) }=\left( x,y\right) $ as in the Lemma$.$ Then
+the (complex) continued fraction for $\sqrt{\left( a,b\right) }$ is given by
+the sequences $\left( A_{j}\right) ,$ $\left( B_{j}\right) $ etc. which are
+calculated as before, with $A_{1}=$ ni$\left( x,y\right) ,$ but for $j\geq
+2, $ 
+\begin{equation*}
+A_{j+1}=\text{ ni}\left( \frac{z+B_{j}}{C_{j}}\right) \text{ }
+\end{equation*}%
+i.e. we do \emph{not} round to $A_{1}$ in the numerator here since the
+customary simplification of replacing $\sqrt{n}$ by $\left\lfloor \sqrt{n}%
+\right\rfloor $ in this formula does not work for complex integers.
+
+(ii) $P_{j}$ should be reduced mod$\left( a,b\right) $ at each stage, where
+for Gaussian integers 
+\begin{equation*}
+\left( c,d\right) \text{ mod }\left( a,b\right) :=\left( c,d\right) -\left(
+a,b\right) \text{ni}\left( \left( c,d\right) /\left( a,b\right) \right) .
+\end{equation*}
+
+(iii) \ In $\mathbf{Z}\left( i\right) $ we \ have the property that $-1$ is
+a square: $-1=i^{2}.$ Hence if $C_{j}$ is a square then so is $\left(
+-1\right) ^{j}C_{j},$ irrespective of the parity of $j.$
+
+(iv) Since $n=a^{2}+b^{2}=b^{2}+a^{2},$ we may start from $\left( a,b\right) 
+$ or $\left( b,a\right) .$
+
+We illustrate the method the following example.
+
+\textbf{Example 6 }Let $n=533,$ the first entry on List 1. In the continued
+fraction for $\sqrt{n}$ we find $B_{3}=2,$ C$_{2}=C_{3}=23$ and so $n=2^{2}+$
+$23^{2.}.$ To factorise $\left( 2,23\right) $ we consider the continued
+fraction for $\sqrt{\left( 2,23\right) }$ taking $\left( x,y\right)
+=3.541...+i3.247...$ and so $A_{1}=\left( 4,3\right) .$ The first square
+value of $C_{j}$ is $C_{6}=$ $\left( 1,0\right) $ and with $P_{6}$ mod $%
+\left( 2,23\right) =\left( 1,0\right) $ \ we have only a trivial
+factorisation. Thus we now try starting with $\left( 23,2\right) .$ We find $%
+\left( x,y\right) =4.800...$ + $i\,0.208...$ and so $A_{1}=\left( 5,0\right)
+.$ After 3 steps we find $P_{3}=\left( -1,24\right) $ , $\left( -1\right)
+^{3}C_{3}=-\left( 0,-2\right) =\left( 0,2\right) =\left( 1,1\right) ^{2}.$
+Then $\left( P_{3}+\left( 1,1\right) \right) \cap \left( 23,2\right) =\left(
+1,0\right) $ and $\left( P_{3}-\left( 1,1\right) \right) \cap \left(
+23,2\right) =\left( 23,2\right) $ and we have again trivial failure. But one
+further step gives $P_{4}=\left( -105,-19\right) $ mod $\left( 23,2\right)
+=\left( 10,-9\right) $ and $\left( -1\right) ^{4}C_{4}=\left( 3,4\right)
+=\left( 2,1\right) ^{2}.$ Then $\left( P_{4}+\left( 2,1\right) \right) \cap
+\left( 23,2\right) =\left( 3,-2\right) $ whose norm is $9+4=13,$ and $\left(
+P_{4}-\left( 2,1\right) \right) \cap \left( 23,2\right) =\left( -5,-4\right) 
+$ whose norm is $25+16=41,$ giving the required factorisation $n=533=13.41$. 
+$\blacklozenge $
+
+This example illustrates a method which works for 67 of the 68 entries in
+List 1 in which one or other of $\left( a,b\right) $ or $\left( b,a\right) $
+(sometimes both) factorise as above. The single exception is $n=3281$ for
+which we find the following.
+
+\textbf{Example 7 \ }Let $n=3281$ where the continued fraction for $\sqrt{%
+3281}$ gives $B_{3}=16,$ $C_{3}=55$ and so $n=16^{2}+55^{2}$ or $%
+55^{2}+16^{2}.$ However both $\left( 16,55\right) $ and $\left( 55,16\right) 
+$ lead (by different routes) to $C_{10}=\left( 1,0\right) $ and $%
+P_{10}\equiv \left( 1,0\right) $ and both lead to trivial factorisations so
+the method fails. However before we abandon $n=3281$ entirely, a further
+observation \ is worth making. It is (almost) evident by inspection that $%
+n=3281=1681+1600=41^{2}+40^{2}$ so we have a different expression of $3281$
+as a sum of squares. It would then be possible to attempt another
+factorisation using $\sqrt{41+i40}$ but this is unnecessarily tedious.
+Instead notice that $\left( 41,40\right) $ and $(16,55)$ are the products of
+different choices of the complex prime factors of $3281.$Hence taking their
+highest common factor we find $\left( 41,40\right) \cap \left( 16,55\right)
+=\left( -1,4\right) $ whose norm is $1^{2}+4^{2}=17$ which is a proper
+divisor of $3281$. The other divisor is $193$ which can be found either by
+division or by taking for instance $\left( 41,40\right) \cap \left(
+16,-55\right) =\left( 12,7\right) $ whose norm is $144+49=193.$ Thus the
+decomposition $3281=17.193$ into primes is complete. $\blacklozenge $
+
+The existence of further ways of writing a given composite integer as a sum
+of squares is dealt with for instance in \cite[Ch. 19, p.164]%
+{Mordell:1969:DT} and \cite[p, 101]{Landau:1927:VZ} where the latter gives
+an explicit formula for the number of such representations. Methods for
+finding numerical values for such representations do not seem to have been
+studied. The search for different expressions of the value of $n$ under
+consideration as $a^{2}\pm 2b^{2}$ is continued is the next two sections.
+
+\section{$\mathbf{Z}\left( \protect\sqrt{-2}\right) $\label{zmt}}
+
+\textbf{Notation} In this section the notation $\left( a,b\right) $ will
+denote the element $a+b\sqrt{-2}$ of $\mathbf{Z}\left( \sqrt{-2}\right) .$
+All arithmetic operations together with the Euclidean algorithm, and the
+formation of continued fractions - the latter also justified in the papers
+of Hurwitz, \cite{Hurwitz:1888:UEC},\cite{Hurwitz:1889:UAK} - will take
+place in $\mathbf{Z}\left( \sqrt{-2}\right) .$ In particular $\mathbf{Z}%
+\left( \sqrt{-2}\right) $satisfies Hurwitz' discreteness condition that only
+a finite number of elements are in any bounded region of the complex plane.
+We again use $\left( a,b\right) \cap (c,d)$ for the highest common factor of 
+$\left( a,b\right) $ and $\left( c,d\right) $, again uniquely defined since $%
+\mathbf{Z}\left( \sqrt{-2}\right) $ is a Euclidean Domain. When $x.y$ are
+real, ni$\left( x,y\right) $ will denote the nearest integer function in $%
+\mathbf{Z}\left( \sqrt{-2}\right) $, equal to $\left( \left\{ x\right\}
+,\left\{ y\right\} \right) $ where $\left\{ x\right\} $ and $\left\{
+y\right\} $ are the unique integers in the intervals $[x-1/2,x+1/2).$and $%
+[y-1/2,y+1/2).$ Note that in contrast to $Z\left( i\right) ,$ $-1$ is not
+here a square and that $\left( a,b\right) $ and $\left( b,a\right) $ are not
+equivalent starting places.
+
+Our input is List 2a of 68 numbers $n$ between 731 and 19883 when $C_{j}=2$%
+,\thinspace\ $j$ is odd and $P_{j}^{2}\equiv -2$ mod $n$.
+
+\textbf{Example 8 }(i) Let $n=731,$ where we have $n=729+2=27^{2}+2.1^{2}$
+so we have to factorise $\left( 27,1\right) $ in $\mathbf{Z}\left( \sqrt{-2}%
+\right) .$ Then $\sqrt{\left( 27,1\right) }=x+y\sqrt{-2}$ where 
+\begin{equation*}
+x=\sqrt{\frac{27+\sqrt{731}}{2}}=5.1979...,\text{ \thinspace }y=\frac{1}{2x}%
+=0.09619...,
+\end{equation*}%
+and $A_{1}=\left( 5,0\right) .$ In the continued fraction for $\sqrt{\left(
+27,1\right) }$ we find that on line 3 we have $\left( -1\right)
+^{3}C_{3}=-\left( 1,2\right) =\left( 1,-1\right) ^{2}$ in $\mathbf{Z}\left( 
+\sqrt{-2}\right) \,$and $P_{3}\equiv \left( 1,-26\right) $ mod $731$. Then $%
+(P_{3}+\left( 1,-1\right) )\cap \left( 27,1\right) \equiv \left( 27,1\right) 
+$ and the factorisation is trivial. We continue to find $C_{7}=C_{3}$ and $%
+P_{7}\equiv \left( 5,-12\right) $ and so $(P_{7}+\left( 1,-1\right) )\cap
+\left( 27,1\right) \equiv \left( 3,2\right) $ with $3^{2}+2.2^{2}=17$ which
+divides $n.$ The other divisor is $43$ which is $731/17$ or by calculating $%
+(P_{7}-\left( 1,-1\right) )\cap \left( 27,1\right) \equiv \left( 5,-3\right) 
+$ whose norm is $25+2.9=43.$
+
+(ii) Let $n=779,$ where $n$ is a proper divisor of $3433^{2}+2$. Then $%
+\left( 3433,1\right) \cap \left( 779,0\right) =\left( 27,5\right) $ with $%
+27^{2}+2.5^{2}=779$ and we have to factorise $\left( 27,5\right) $ in $%
+\mathbf{Z}\left( \sqrt{-2}\right) .$ Then $\sqrt{\left( 27,5\right) }=x+y%
+\sqrt{-2}$ where 
+\begin{equation*}
+x=\sqrt{\frac{27+\sqrt{779}}{2}}=5.2397...,\text{ \thinspace }y=\frac{1}{2x}%
+=0.4721...,
+\end{equation*}%
+and $A_{1}=\left( 5,0\right) .$ In the continued fraction for $\sqrt{\left(
+27,5\right) }$ we find that on line 7 we have $\left( -1\right)
+^{7}C_{7}=-\left( 1,-2\right) =\left( 1,1\right) ^{2}$ in $\mathbf{Z}\left( 
+\sqrt{-2}\right) \,$and $P_{7}\equiv \left( 12,0\right) $ mod $779$. Then $%
+(P_{7}+\left( 1,1\right) )\cap \left( 27,5\right) \equiv \left( 1,3\right) $
+with $1^{2}+2.3^{2}=19$ which is a divisor of $n,$ the other being $41.$ $%
+\blacklozenge $
+
+The method illustrated in this example succeeds for all elements of List 2a
+with $3$ exceptions, namely $n=3827,7571,$ and 10307 which we will will
+consider individually.
+
+\textbf{Example 9 }(i) Let $n=3827$ which is a divisor of $3155^{2}+2$ Then
+we have $\left( 3155,1\right) \cap \left( 3827,0\right) =\left( 57,17\right) 
+$ to be factorised by considering $\sqrt{\left( 57,17\right) }.$
+
+Proceeding as \ in the above examples we find $x=7.709...,\,y=1.102...$ and
+so $A_{1}=\left( 8,1\right) .$ At $j=5$ we have $\left( -1\right)
+^{j}C_{j}=\left( -1\right) ^{5}C_{5}=-\left( 7,4\right) =\left( 1,-2\right)
+^{2}$ but this gives only a trivial factorisation and other squares fail
+similarly. \ To find a different expression for $n$ as $a^{2}+2b^{2}$ we
+could follow the example $7$ and look for values of $a,b$ which are nearly
+equal. This quickly gives $a=33,\,b=37$ and to $\left( 57,17\right) \cap
+\left( 33,37\right) =\left( 5,3\right) $ whose norm is $25+18=43$ which is a
+divisor of $n$ and the factorisation follows.
+
+(ii) Let $n=7571=87^{2}+2$ and we go directly to look for values of $a,b$
+with $n=a^{2}+2b^{2}$ which are nearly equal. This takes a little longer to
+find $a=39,\,b=55$ and $\left( 87,1\right) \cap \left( 39,55\right) =(9,4)$
+whose norm is $81^{2}+2.4^{2}=113,$ giving $n=113.67.$
+
+(iii) Let $n=10307$ which is a divisor of $\left( 4738\right) ^{2}+2$ and $%
+\left( 4738,1\right) \cap \left( 10307,1\right) =\left( 87,37\right) $ with $%
+87^{2}+2.37^{2}=10307.$ Here the required values of $a,b$ with $%
+a^{2}+2b^{2}=10307$ are not at all equal and it is quicker to start from $%
+a=1 $ and increase by (necessarily odd) values of $a$ to reach $a=15,\,b=71.$
+Then $\left( 87,37\right) \cap \left( 15,71\right) =\left( 17,18\right) $
+whose norm is $937$ giving $n=11.937.$ $\blacklozenge $
+
+\section{$\mathbf{Z}\left( \protect\sqrt{2}\right) $\label{zpt}}
+
+\textbf{Notation} In this section the notation $\left( a,b\right) $ will
+denote the element $a+b\sqrt{2}$ of $\mathbf{Z}\left( \sqrt{2}\right) $ with
+arithmetic operations etc. taking place in $\mathbf{Z}\left( \sqrt{2}\right)
+.$ We \ should expect to encounter difficulties since the integers of $%
+\mathbf{Z}\left( \sqrt{2}\right) $ are dense on the real line and hence do
+not satisfy Hurwitz' discreteness condition. Given this, the success rate of
+37\% for the square root method is surprisingly high. Failures are dealt
+with using the method of searching for alternative solutions of $%
+x^{2}-2y^{2}=n$ as in previous sections. For this section however there is a
+systematic method which succeeds for all values of $n$ under consideration.
+
+Our input is now the List 2b of 101 numbers $n$ between 119 and 19967 in
+which $C_{j}=2$ with $j$ is even and $P_{j}^{2}\equiv 2$ mod $n$.
+
+We begin with $2$ examples of the square root method.
+
+\textbf{Example 10 }(i) Let $n=119,$ the first entry in List 2b. We have $%
+n=11^{2}-2$ and so $\left( 11,1\right) $ is to be factorised in $\mathbf{Z}%
+\left( \sqrt{2}\right) .$ For $\left( x+y\sqrt{2}\right) ^{2}=11$ +$\sqrt{2}$
+we have 
+\begin{equation*}
+x=\sqrt{\frac{11+\sqrt{119}}{2}}=3.309...\text{, \ }y=\frac{1}{2x}=0.151...%
+\text{and }A_{1}=\left( 3,0\right) .
+\end{equation*}%
+Then after only $2$ steps we find $C_{2}=\left( 1,0\right) ,\,P_{2}=\left(
+19,-9\right) $ and $\left( P_{2}+1\right) \cap \left( 11,1\right) =\left(
+1,1\right) ,$ a unit, while $\left( P_{2}-1\right) \cap \left( 11,1\right)
+=\left( 11,1\right) $ so the method fails before it has got properly started.
+
+(ii) To find an example where the method succeeds have to go to the seventh
+element in List 2b, namely $n=1343.$ Here $623^{2}\equiv 2$ mod $n$ and $%
+\left( 623,1\right) \cap \left( 1343,0\right) =\left( 41,13\right) $ with $%
+\sqrt{\left( 41,13\right) }$ to be examined. Here $\left( 41,13\right) $ has
+square root $x+y\sqrt{2}$ where 
+\begin{equation*}
+x=\sqrt{\frac{41+\sqrt{1343}}{2}}=6.230...\text{,\thinspace\ }y=\frac{13}{2x}%
+=1.04...\text{and }A_{1}=\left( 6,1\right) .
+\end{equation*}%
+The expansion of $\sqrt{\left( 41,13\right) }$ gives $C_{6}=\left(
+3,2\right) =\left( 1,1\right) ^{2}$ and $P_{6}=\left( -10,0\right) .$ Then $%
+\left( P_{6}+\left( 1,1\right) \right) \cap \left( 41,13\right) =\left(
+-9,1\right) $ whose norm is $79$ which divides $1343$ and the other factor
+is $17$. $\blacklozenge $
+
+Going through the whole of List 2b we find $\ 37$ successes and $64$
+failures which, though more than might be expected, is still hardly
+satisfactory. To get an idea of where possible additional integer solutions
+of $x^{2}-2y^{2}=n$ could be found we return to Example 10(i) above in which 
+$n=119.$ Notice that the solution $\left( 11,1\right) $ has the least value
+of $y$ and hence is the nearest \ to the intercept $x=\sqrt{n}$ of the
+hyperbola $x^{2}-2y^{2}=n$ with the $x-$axis. So we may consider possible
+points on the corresponding hyperbola $x^{2}-2y^{2}=-n$ with small $x,$ or a
+value of $y$ near to $y=\sqrt{n/2}.$ When $n=119$ we have $\sqrt{n/2}=7.713$
+and this leads at once to $y=8$, $x=3$ with $x^{2}-2y^{2}=-n=-119.$ We
+further observe that $\left( 11,1\right) \cap \left( 3,8\right) =\left(
+5,2\right) $ whose norm is $25-8=17$ which is a divisor of $119,$ the other
+being $7.$
+
+We try an example from the opposite end of the list.
+
+\textbf{Example 11} Let $n=19967.$ The $x-$ intercept is at $x=\sqrt{n}%
+=141.304..$ so we start looking at the next smallest (necessarily odd) value
+on $x^{2}-2y^{2}=n$, namely $x=143.$ Here $y$ is not an integer, but $x=145$
+gives $y=23.$
+
+For the $y-$ intercept at $\sqrt{n/2}=99.917...$ we start looking at $y=100.$
+Both $100$ and $101$ give non-integer values of $x$ \ on $x^{2}-2y^{2}=-n,$
+but $y=102$ gives $x=29.$
+
+Finally $\left( 145,23\right) \cap \left( 29,102\right) =\left( 5,-16\right) 
+$ whose norm is $487$ giving the factorisation $n=17.487.$ $\blacklozenge $
+
+We find that this simple-minded method works for all $101$ numbers in List
+2b (though surely not for all integers without restriction!) and we leave to
+future investigators the question of whether in fact it works for all
+integers of this type.
+
+\textbf{Acknowledgements} It is a pleasure to thank Professor Hugh Williams
+for friendly and informative correspondence, Dr Ingeborg Guba in
+Stadtallendorf and the staff of the Bodleian Library for assistance with
+finding copies of early German documents, and David Walker for indefatigable
+programming.
+
+\bigskip
+
+7 Redgrove Park, Cheltenham, GL51 6QY, UK
+
+\bigskip
+
+peter.walker@cantab.net
+
+\printbibliography
+
+\end{document}
